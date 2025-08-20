@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HTML Capture</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 10px; width: 240px; background-color: #f9f9f9; }
+    button {
+      display: block; width: 100%; margin: 8px 0; padding: 10px;
+      font-size: 14px; cursor: pointer; border: 1px solid transparent; border-radius: 4px;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .primary-btn { background-color: #007acc; color: #fff; }
+    .primary-btn:hover { background-color: #005a9e; }
+    .secondary-btn { background-color: #4CAF50; color: #fff; }
+    .secondary-btn:hover { background-color: #45a049; }
+    .tertiary-btn { background-color: #fff; color: #555; border-color: #ccc; }
+    .tertiary-btn:hover { background-color: #f0f0f0; }
+    .danger-btn { background-color: #d9534f; color: #fff; }
+    .danger-btn:hover { background-color: #c9302c; }
+
+    .info-box { border: 1px solid #ddd; padding: 10px; margin-top: 12px; border-radius: 4px; background-color: #fff; }
+    .meta { font-size: 12px; color: #666; word-wrap: break-word; }
+    #messageBox {
+      padding: 10px; margin-top: 10px; border-radius: 4px;
+      text-align: center; display: none;
+    }
+    .show { display: block !important; }
+    .success { background-color: #dff0d8; color: #3c763d; }
+    .error { background-color: #f2dede; color: #a94442; }
+  </style>
+</head>
+<body>
+  <button id="captureBtn" class="primary-btn">Capture/Update Baseline for this URL</button>
+  <button id="compareBtn" class="secondary-btn">Compare (Side-by-Side)</button>
+  <button id="viewChangesBtn" class="secondary-btn">View Changes (Merged)</button>
+  
+  <div class="info-box">
+    <div id="baselineInfo" class="meta">Checking for baseline...</div>
+  </div>
+  
+  <button id="manageBtn" class="tertiary-btn">Manage All Baselines</button>
+
+  <div id="messageBox"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Baselines</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
+    h1 { color: #333; }
+    #baselinesList {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .baseline-item {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      word-break: break-all;
+    }
+    .baseline-info .url {
+      font-weight: bold;
+      color: #005a9e;
+    }
+    .baseline-info .date {
+      font-size: 0.9em;
+      color: #777;
+      margin-top: 5px;
+    }
+    .delete-btn {
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .delete-btn:hover {
+      background-color: #c9302c;
+    }
+    #emptyMessage {
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stored Baselines</h1>
+  <ul id="baselinesList">
+    </ul>
+  <p id="emptyMessage" style="display: none;">You have no saved baselines.</p>
+
+  <script src="baselines_list.js"></script>
+</body>
+</html>

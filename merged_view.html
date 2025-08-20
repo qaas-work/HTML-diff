@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Merged HTML Changes</title>
+  <style>
+    :root {
+      --delete-bg: rgba(255, 82, 82, 0.15);
+      --add-bg: rgba(77, 208, 88, 0.15);
+      --delete-border: #d73a49;
+      --add-border: #28a745;
+    }
+    body {
+      margin: 0;
+      /* The body will be replaced, so base styles are minimal */
+    }
+    /* Use `display: contents` to make our highlight tags invisible to the layout engine,
+      preventing them from breaking the page's structure.
+    */
+    del.diff-deleted, ins.diff-added {
+      display: contents;
+    }
+
+    /* Apply styling to the children of our highlight tags. This is more robust
+      than styling the <del> and <ins> tags directly.
+    */
+    .diff-deleted > * {
+      background-color: var(--delete-bg) !important;
+      outline: 1px solid var(--delete-border) !important;
+    }
+    .diff-added > * {
+      background-color: var(--add-bg) !important;
+      outline: 1px solid var(--add-border) !important;
+    }
+  </style>
+</head>
+<body>
+  <p style="font-family: sans-serif; padding: 2em; text-align: center;">Rendering changes...</p>
+  <script src="merged_view.js"></script>
+</body>
+</html>

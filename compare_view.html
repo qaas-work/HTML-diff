@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HTML Comparison</title>
+  <style>
+    :root {
+      --bg-dark: #1e1e1e;
+      --bg-light: #252526;
+      --border-color: #333;
+      --text-color: #d4d4d4;
+      --text-muted: #9d9d9d;
+      --accent-color: #007acc;
+      --delete-bg: rgba(255, 100, 100, 0.2);
+      --delete-border: rgba(255, 100, 100, 0.5);
+      --add-bg: rgba(100, 255, 100, 0.2);
+      --add-border: rgba(100, 255, 100, 0.5);
+      --highlight-bg: rgba(255, 215, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      height: 100vh;
+      background-color: var(--bg-dark);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+    .header {
+      background-color: var(--border-color);
+      padding: 10px 15px;
+      border-bottom: 1px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.2em;
+      color: var(--accent-color);
+    }
+    .url-info {
+      font-size: 0.8em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    /* New search input styles */
+    #searchInput {
+      background-color: var(--bg-light);
+      border: 1px solid #444;
+      color: var(--text-color);
+      padding: 6px 10px;
+      border-radius: 4px;
+      width: 200px;
+      transition: all 0.2s;
+    }
+    #searchInput:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      background-color: #333;
+    }
+    .statistics {
+      font-size: 0.8em;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    .navigation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-btn {
+      background-color: var(--bg-light);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .nav-btn:hover {
+      background-color: #3a3a3a;
+    }
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #changeCounter {
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .pane {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border-color);
+    }
+    .pane:last-child {
+      border-right: none;
+    }
+    .pane-header {
+      padding: 8px 12px;
+      background-color: var(--bg-light);
+      font-weight: bold;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .pane-content {
+      flex: 1;
+      overflow: auto;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+    .diff-deleted {
+      background-color: var(--delete-bg);
+      border-left: 2px solid var(--delete-border);
+      display: block;
+      width: 100%;
+    }
+    .diff-added {
+      background-color: var(--add-bg);
+      border-left: 2px solid var(--add-border);
+      display: block;
+      width: 100%;
+    }
+    .highlight {
+      background-color: var(--highlight-bg);
+      transition: background-color 0.3s ease;
+    }
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-end;
+      }
+      
+      .navigation {
+        order: -1;
+      }
+      
+      .main-content {
+        flex-direction: column;
+      }
+      
+      .pane {
+        width: 100%;
+        min-height: 300px;
+      }
+    }
+
+    .diff-placeholder {
+      display: block;
+      background-color: rgba(80, 80, 80, 0.15);
+      border-left: 2px solid rgba(128, 128, 128, 0.3);
+      width: 100%;
+      min-height: 1.5em; /* Matches the line-height for an empty line */
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>HTML Diff</h1>
+      <div id="urlInfo" class="url-info">Loading...</div>
+    </div>
+    <div class="controls">
+      <!-- Search Bar Added Here -->
+      <input type="search" id="searchInput" placeholder="Search changes...">
+      <div id="statistics" class="statistics"></div>
+      <div class="navigation">
+        <button id="prevChange" class="nav-btn" title="Previous change">Prev</button>
+        <div id="changeCounter">0 / 0</div>
+        <button id="nextChange" class="nav-btn" title="Next change">Next</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="pane">
+      <div class="pane-header">Baseline HTML</div>
+      <div class="pane-content" id="baseline"></div>
+    </div>
+    <div class="pane">
+      <div class="pane-header">Current HTML</div>
+      <div class="pane-content" id="current"></div>
+    </div>
+  </div>
+
+  <script src="compare_view.js"></script>
+</body>
+</html>
