@@ -139,8 +139,8 @@ function renderSideBySide(baselineHTML, currentHTML) {
       const addId = `change-${changeCounter}-add`;
       const delId = `change-${changeCounter}-del`; // ID for the placeholder
 
-      baselineContent += `<span class="diff-placeholder" id="${delId}">&nbsp;</span>`; // Placeholder
-      currentContent += `<span class="diff-added" id="${addId}">${escapedValue}</span>`;
+      baselineContent += `<span class="diff-deleted" id="${delId}">${escapedDelValue}</span>\n`;
+      currentContent += `<span class="diff-added" id="${addId}">${escapedAddValue}</span>\n`;
 
       allChanges.push({ type: 'insert', delId, addId });
       changeCounter++;
@@ -160,46 +160,117 @@ function renderSideBySide(baselineHTML, currentHTML) {
 }
 
 /**
+ * Utility: get all matching node.outerHTML from an HTML string using XPath
+ */
+function getNodesByXPath(htmlString, xpath) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, "text/html");
+
+  const result = document.evaluate(xpath, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+  const matches = [];
+  
+  for (let i = 0; i < result.snapshotLength; i++) {
+    const node = result.snapshotItem(i);
+    if (node.outerHTML) {
+      matches.push(node.outerHTML.toLowerCase());
+    }
+  }
+  return matches;
+}
+
+/**
  * Filters changes based on the search input and updates the view.
+ * Supports both plain text search and XPath queries.
  */
 function filterAndNavigate() {
-  const searchTerm = searchInput.value.toLowerCase();
-  
+  const searchTerm = searchInput.value.trim();
+
   if (!searchTerm) {
-    // If search is empty, show all changes
+    // Reset → show all
     filteredChanges = [...allChanges];
     allChanges.forEach(change => {
-      const delEl = change.delId ? document.getElementById(change.delId) : null;
-      const addEl = change.addId ? document.getElementById(change.addId) : null;
-      if (delEl) delEl.style.display = 'block';
-      if (addEl) addEl.style.display = 'block';
+      const delEl = document.getElementById(change.delId);
+      const addEl = document.getElementById(change.addId);
+      if (delEl) delEl.classList.remove('filtered-out');
+      if (addEl) addEl.classList.remove('filtered-out');
     });
-  } else {
-    // Filter the changes based on their text content
-    filteredChanges = allChanges.filter(change => {
-      const delEl = change.delId ? document.getElementById(change.delId) : null;
-      const addEl = change.addId ? document.getElementById(change.addId) : null;
+  } else if (searchTerm.startsWith("//")) {
+    // XPath mode
+    // Get full baseline/current HTML text
+    const baselineHTML = baselinePane.textContent;
+    const currentHTML = currentPane.textContent;
 
+    // Get matching nodes
+    const baselineMatches = getNodesByXPath(baselineHTML, searchTerm);
+    const currentMatches = getNodesByXPath(currentHTML, searchTerm);
+    const allMatches = baselineMatches.concat(currentMatches);
+
+    filteredChanges = allChanges.filter(change => {
+      const delEl = document.getElementById(change.delId);
+      const addEl = document.getElementById(change.addId);
       if (!delEl && !addEl) return false;
 
       const delText = delEl ? delEl.textContent.toLowerCase() : '';
       const addText = addEl ? addEl.textContent.toLowerCase() : '';
 
-      const isMatch = delText.includes(searchTerm) || addText.includes(searchTerm);
+      const isMatch = allMatches.some(match =>
+        delText.includes(match) || addText.includes(match)
+      );
 
-      // Toggle visibility of both elements based on the match
-      if (delEl) delEl.style.display = isMatch ? 'block' : 'none';
-      if (addEl) addEl.style.display = isMatch ? 'block' : 'none';
+      // Use CSS class instead of direct display manipulation
+      if (delEl) {
+        if (isMatch) {
+          delEl.classList.remove('filtered-out');
+        } else {
+          delEl.classList.add('filtered-out');
+        }
+      }
+      if (addEl) {
+        if (isMatch) {
+          addEl.classList.remove('filtered-out');
+        } else {
+          addEl.classList.add('filtered-out');
+        }
+      }
+
+      return isMatch;
+    });
+  } else {
+    // Plain text search mode
+    const term = searchTerm.toLowerCase();
+    filteredChanges = allChanges.filter(change => {
+      const delEl = document.getElementById(change.delId);
+      const addEl = document.getElementById(change.addId);
+
+      const delText = delEl ? delEl.textContent.toLowerCase() : '';
+      const addText = addEl ? addEl.textContent.toLowerCase() : '';
+
+      const isMatch = delText.includes(term) || addText.includes(term);
+
+      // Use CSS class instead of direct display manipulation
+      if (delEl) {
+        if (isMatch) {
+          delEl.classList.remove('filtered-out');
+        } else {
+          delEl.classList.add('filtered-out');
+        }
+      }
+      if (addEl) {
+        if (isMatch) {
+          addEl.classList.remove('filtered-out');
+        } else {
+          addEl.classList.add('filtered-out');
+        }
+      }
 
       return isMatch;
     });
   }
-  
-  // Reset navigation to the beginning of the filtered list
+
+  // Reset navigation
   currentIndex = -1;
   updateNavigation();
 }
-
 
 /**
  * Updates the navigation controls (buttons, counter) and highlighting.

@@ -132,22 +132,42 @@
       font-size: 0.9em;
       line-height: 1.5;
     }
+    .diff-deleted,
+    .diff-added,
+    .diff-placeholder {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      margin: 12px 0;              /* <-- spacing above and below */
+      border-radius: 6px;          /* rounded box */
+      white-space: pre-wrap;
+    }
+
     .diff-deleted {
       background-color: var(--delete-bg);
-      border-left: 2px solid var(--delete-border);
-      display: block;
-      width: 100%;
+      border: 1px solid var(--delete-border);
     }
+
     .diff-added {
       background-color: var(--add-bg);
-      border-left: 2px solid var(--add-border);
+      border: 1px solid var(--add-border);
+    }
+
+    .diff-placeholder {
       display: block;
+      background-color: rgba(80, 80, 80, 0.15);
+      border-left: 2px solid rgba(128, 128, 128, 0.3);
       width: 100%;
+      min-height: 1.5em; /* Matches the line-height for an empty line */
     }
+
     .highlight {
-      background-color: var(--highlight-bg);
-      transition: background-color 0.3s ease;
+      background-color: var(--highlight-bg) !important;
+      outline: 2px solid var(--accent-color);
+      margin: 20px 0;              /* even more breathing space when active */
+      transition: all 0.25s ease;
     }
+
     .empty-state {
       display: flex;
       justify-content: center;
@@ -158,6 +178,9 @@
       padding: 40px 20px;
     }
 
+    .filtered-out {
+        display: none !important;
+    }
     /* Responsive design */
     @media (max-width: 768px) {
       .controls {
@@ -180,13 +203,6 @@
       }
     }
 
-    .diff-placeholder {
-      display: block;
-      background-color: rgba(80, 80, 80, 0.15);
-      border-left: 2px solid rgba(128, 128, 128, 0.3);
-      width: 100%;
-      min-height: 1.5em; /* Matches the line-height for an empty line */
-    }
   </style>
 </head>
 <body>
