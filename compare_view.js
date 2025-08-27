@@ -9,19 +9,18 @@ function esc(s) {
 }
 
 /**
- * Enhanced tokenizer that better handles HTML structure
+ * Enhanced tokenizer that better handles HTML structure.
  * @param {string} str The string to tokenize.
  * @returns {string[]} An array of tokens.
  */
 function tokenize(str) {
-  // More sophisticated regex to handle HTML tags, attributes, text content, and whitespace
   const re = /(<[^>]+>)|(\w+(?:=["'][^"']*["'])?)|(\s+)|([^\w\s<>]+)/g;
   const tokens = str.match(re) || [];
-  return tokens.filter(token => token); // Remove empty tokens
+  return tokens.filter(token => token);
 }
 
 /**
- * Improved diff algorithm with better change detection
+ * Improved diff algorithm with better change detection.
  */
 function diffTokens(aStr, bStr) {
   const A = tokenize(aStr);
@@ -29,9 +28,8 @@ function diffTokens(aStr, bStr) {
   const n = A.length;
   const m = B.length;
 
-  // Initialize DP table for LCS
   const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-  
+
   for (let i = n - 1; i >= 0; i--) {
     for (let j = m - 1; j >= 0; j--) {
       if (A[i] === B[j]) {
@@ -42,33 +40,27 @@ function diffTokens(aStr, bStr) {
     }
   }
 
-  // Backtrack to construct the diff
   const diff = [];
   let i = 0, j = 0;
+
   while (i < n && j < m) {
     if (A[i] === B[j]) {
       diff.push(['equal', A[i]]);
-      i++;
-      j++;
+      i++; j++;
     } else {
-      // Look ahead to find the end of the differing block
       let iEnd = i, jEnd = j;
-      while(iEnd < n && jEnd < m && A[iEnd] !== B[jEnd]) {
-        if (dp[iEnd+1][j] > dp[i][jEnd+1]) {
+      while (iEnd < n && jEnd < m && A[iEnd] !== B[jEnd]) {
+        if (dp[iEnd + 1][j] > dp[i][jEnd + 1]) {
           iEnd++;
         } else {
           jEnd++;
         }
       }
-      
       const deleted = A.slice(i, iEnd).join('');
       const added = B.slice(j, jEnd).join('');
-      
       if (deleted) diff.push(['delete', deleted]);
       if (added) diff.push(['insert', added]);
-      
-      i = iEnd;
-      j = jEnd;
+      i = iEnd; j = jEnd;
     }
   }
 
@@ -78,11 +70,12 @@ function diffTokens(aStr, bStr) {
   return diff;
 }
 
-
-// --- Main Logic ---
-let allChanges = []; // Stores all identified changes
-let filteredChanges = []; // Stores changes that match the current search filter
+// --- Globals ---
+let allChanges = [];
+let filteredChanges = [];
 let currentIndex = -1;
+let fullBaselineHTML = '';
+let fullCurrentHTML = '';
 
 // --- DOM Elements ---
 const baselinePane = document.getElementById('baseline');
@@ -93,13 +86,11 @@ const counterEl = document.getElementById('changeCounter');
 const searchInput = document.getElementById('searchInput');
 
 /**
- * Renders the side-by-side diff view, grouping related changes and adding placeholders.
- * @param {string} baselineHTML The original HTML.
- * @param {string} currentHTML The new HTML.
+ * Renders the side-by-side diff view.
  */
 function renderSideBySide(baselineHTML, currentHTML) {
   const diff = diffTokens(baselineHTML, currentHTML);
-  
+
   let baselineContent = '';
   let currentContent = '';
   allChanges = [];
@@ -107,54 +98,36 @@ function renderSideBySide(baselineHTML, currentHTML) {
 
   for (let i = 0; i < diff.length; i++) {
     const [type, value] = diff[i];
-    
-    // Check for a delete/insert pair, which represents a "change"
-    if (type === 'delete' && i + 1 < diff.length && diff[i + 1][0] === 'insert') {
-      const escapedDelValue = esc(value);
-      const [_nextType, nextValue] = diff[i + 1];
-      const escapedAddValue = esc(nextValue);
 
+    if (type === 'delete' && i + 1 < diff.length && diff[i + 1][0] === 'insert') {
       const delId = `change-${changeCounter}-del`;
       const addId = `change-${changeCounter}-add`;
-
-      baselineContent += `<span class="diff-deleted" id="${delId}">${escapedDelValue}</span>`;
-      currentContent += `<span class="diff-added" id="${addId}">${escapedAddValue}</span>`;
-
+      baselineContent += `<span class="diff-deleted" id="${delId}">${esc(value)}</span>`;
+      currentContent += `<span class="diff-added" id="${addId}">${esc(diff[i + 1][1])}</span>`;
       allChanges.push({ type: 'change', delId, addId });
-      
-      i++; // Skip the next element as it has been processed
-      changeCounter++;
+      i++; changeCounter++;
     } else if (type === 'delete') {
-      const escapedValue = esc(value);
       const delId = `change-${changeCounter}-del`;
-      const addId = `change-${changeCounter}-add`; // ID for the placeholder
-
-      baselineContent += `<span class="diff-deleted" id="${delId}">${escapedValue}</span>`;
-      currentContent += `<span class="diff-placeholder" id="${addId}">&nbsp;</span>`; // Placeholder
-
+      const addId = `change-${changeCounter}-add`;
+      baselineContent += `<span class="diff-deleted" id="${delId}">${esc(value)}</span>`;
+      currentContent += `<span class="diff-placeholder" id="${addId}">&nbsp;</span>`;
       allChanges.push({ type: 'delete', delId, addId });
       changeCounter++;
     } else if (type === 'insert') {
-      const escapedValue = esc(value);
       const addId = `change-${changeCounter}-add`;
-      const delId = `change-${changeCounter}-del`; // ID for the placeholder
-
-      baselineContent += `<span class="diff-deleted" id="${delId}">${escapedDelValue}</span>\n`;
-      currentContent += `<span class="diff-added" id="${addId}">${escapedAddValue}</span>\n`;
-
+      const delId = `change-${changeCounter}-del`;
+      baselineContent += `<span class="diff-placeholder" id="${delId}">&nbsp;</span>`;
+      currentContent += `<span class="diff-added" id="${addId}">${esc(value)}</span>`;
       allChanges.push({ type: 'insert', delId, addId });
       changeCounter++;
-    } else { // 'equal'
-      const escapedValue = esc(value);
-      baselineContent += escapedValue;
-      currentContent += escapedValue;
+    } else {
+      baselineContent += esc(value);
+      currentContent += esc(value);
     }
   }
 
   baselinePane.innerHTML = baselineContent;
   currentPane.innerHTML = currentContent;
-
-  // Initially, all changes are visible
   filteredChanges = [...allChanges];
   updateNavigation();
 }
@@ -166,12 +139,13 @@ function getNodesByXPath(htmlString, xpath) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, "text/html");
 
-  const result = document.evaluate(xpath, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+  // Fix: use doc.evaluate instead of document.evaluate
+  const result = doc.evaluate(xpath, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
   const matches = [];
   
   for (let i = 0; i < result.snapshotLength; i++) {
     const node = result.snapshotItem(i);
-    if (node.outerHTML) {
+    if (node && node.outerHTML) {
       matches.push(node.outerHTML.toLowerCase());
     }
   }
@@ -180,7 +154,7 @@ function getNodesByXPath(htmlString, xpath) {
 
 /**
  * Filters changes based on the search input and updates the view.
- * Supports both plain text search and XPath queries.
+ * Now supports both plain text search and XPath queries.
  */
 function filterAndNavigate() {
   const searchTerm = searchInput.value.trim();
@@ -188,21 +162,12 @@ function filterAndNavigate() {
   if (!searchTerm) {
     // Reset → show all
     filteredChanges = [...allChanges];
-    allChanges.forEach(change => {
-      const delEl = document.getElementById(change.delId);
-      const addEl = document.getElementById(change.addId);
-      if (delEl) delEl.classList.remove('filtered-out');
-      if (addEl) addEl.classList.remove('filtered-out');
-    });
+    updateDisplayForFilter();
   } else if (searchTerm.startsWith("//")) {
     // XPath mode
-    // Get full baseline/current HTML text
-    const baselineHTML = baselinePane.textContent;
-    const currentHTML = currentPane.textContent;
-
-    // Get matching nodes
-    const baselineMatches = getNodesByXPath(baselineHTML, searchTerm);
-    const currentMatches = getNodesByXPath(currentHTML, searchTerm);
+    // Use the original HTML strings, not the textContent of the panes
+    const baselineMatches = getNodesByXPath(fullBaselineHTML, searchTerm);
+    const currentMatches = getNodesByXPath(fullCurrentHTML, searchTerm);
     const allMatches = baselineMatches.concat(currentMatches);
 
     filteredChanges = allChanges.filter(change => {
@@ -214,27 +179,12 @@ function filterAndNavigate() {
       const addText = addEl ? addEl.textContent.toLowerCase() : '';
 
       const isMatch = allMatches.some(match =>
-        delText.includes(match) || addText.includes(match)
+        match.includes(delText) || match.includes(addText)
       );
-
-      // Use CSS class instead of direct display manipulation
-      if (delEl) {
-        if (isMatch) {
-          delEl.classList.remove('filtered-out');
-        } else {
-          delEl.classList.add('filtered-out');
-        }
-      }
-      if (addEl) {
-        if (isMatch) {
-          addEl.classList.remove('filtered-out');
-        } else {
-          addEl.classList.add('filtered-out');
-        }
-      }
 
       return isMatch;
     });
+    updateDisplayForFilter();
   } else {
     // Plain text search mode
     const term = searchTerm.toLowerCase();
@@ -246,25 +196,9 @@ function filterAndNavigate() {
       const addText = addEl ? addEl.textContent.toLowerCase() : '';
 
       const isMatch = delText.includes(term) || addText.includes(term);
-
-      // Use CSS class instead of direct display manipulation
-      if (delEl) {
-        if (isMatch) {
-          delEl.classList.remove('filtered-out');
-        } else {
-          delEl.classList.add('filtered-out');
-        }
-      }
-      if (addEl) {
-        if (isMatch) {
-          addEl.classList.remove('filtered-out');
-        } else {
-          addEl.classList.add('filtered-out');
-        }
-      }
-
       return isMatch;
     });
+    updateDisplayForFilter();
   }
 
   // Reset navigation
@@ -273,8 +207,22 @@ function filterAndNavigate() {
 }
 
 /**
- * Updates the navigation controls (buttons, counter) and highlighting.
- * Works with the `filteredChanges` array.
+ * A helper function to update the display based on the filtered changes.
+ */
+function updateDisplayForFilter() {
+  allChanges.forEach(change => {
+    const delEl = document.getElementById(change.delId);
+    const addEl = document.getElementById(change.addId);
+    
+    const isFiltered = filteredChanges.some(fc => fc.delId === change.delId);
+    
+    if (delEl) delEl.style.display = isFiltered ? 'block' : 'none';
+    if (addEl) addEl.style.display = isFiltered ? 'block' : 'none';
+  });
+}
+
+/**
+ * Updates navigation controls and highlights.
  */
 function updateNavigation() {
   const totalChanges = filteredChanges.length;
@@ -282,38 +230,27 @@ function updateNavigation() {
   prevBtn.disabled = currentIndex <= 0;
   nextBtn.disabled = currentIndex >= totalChanges - 1;
 
-  // Remove previous highlights from all elements
   document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
 
   if (currentIndex >= 0 && currentIndex < totalChanges) {
     const change = filteredChanges[currentIndex];
-    
-    const delEl = change.delId ? document.getElementById(change.delId) : null;
-    const addEl = change.addId ? document.getElementById(change.addId) : null;
-
+    const delEl = document.getElementById(change.delId);
+    const addEl = document.getElementById(change.addId);
     let targetElement = null;
 
     if (delEl) {
       delEl.classList.add('highlight');
-      targetElement = delEl; // Prioritize this element for scrolling calculation
+      targetElement = delEl;
     }
     if (addEl) {
       addEl.classList.add('highlight');
-      if (!targetElement) {
-        targetElement = addEl; // Fallback to this one if no deletion element
-      }
+      if (!targetElement) targetElement = addEl;
     }
 
-    // If we have an element to scroll to, calculate its position and sync both panes
     if (targetElement) {
-      // Temporarily disable manual scroll listeners to prevent loops during programmatic scroll
-      activePane = null; 
-
+      activePane = null;
       const paneContainer = targetElement.parentElement;
-      // Calculate the ideal scroll position to center the element
       const scrollPosition = targetElement.offsetTop - (paneContainer.clientHeight / 2) + (targetElement.clientHeight / 2);
-
-      // Programmatically scroll both panes to the same calculated position
       baselinePane.scrollTo({ top: scrollPosition, behavior: 'smooth' });
       currentPane.scrollTo({ top: scrollPosition, behavior: 'smooth' });
     }
@@ -322,9 +259,7 @@ function updateNavigation() {
 
 document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.local.get(['baselineData', 'currentData'], (data) => {
-    // ADDED: Clean up storage after reading the data.
     chrome.storage.local.remove(['baselineData', 'currentData']);
-
     const { baselineData, currentData } = data;
 
     if (!baselineData || !currentData) {
@@ -334,17 +269,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const baseline = baselineData.html || '';
     const current = currentData.html || '';
-    
+
     updateURLInfo(baselineData.url);
-    
+
     if (!baseline) {
       baselinePane.textContent = "No baseline HTML was found for this URL.";
       return;
     }
-     if (!current) {
+    if (!current) {
       currentPane.textContent = "No current HTML captured in this session.";
       return;
     }
+
+    // Store the original, un-escaped HTML strings in global variables for later use
+    fullBaselineHTML = baseline;
+    fullCurrentHTML = current;
 
     try {
       renderSideBySide(baseline, current);
@@ -358,17 +297,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Updates URL information in the header
+ * Updates URL information in the header.
  */
 function updateURLInfo(url) {
   const urlInfo = document.getElementById('urlInfo');
-  if (urlInfo && url) {
-    urlInfo.textContent = url;
-  }
+  if (urlInfo && url) urlInfo.textContent = url;
 }
 
 /**
- * Calculates and displays statistics about the comparison
+ * Calculates and displays statistics about the comparison.
  */
 function calculateStatistics(baseline, current) {
   const stats = {
@@ -378,7 +315,7 @@ function calculateStatistics(baseline, current) {
     baselineLines: (baseline.match(/\n/g) || []).length + 1,
     currentLines: (current.match(/\n/g) || []).length + 1
   };
-  
+
   const statsEl = document.getElementById('statistics');
   if (statsEl) {
     const diffSign = stats.sizeDifference > 0 ? '+' : '';
@@ -406,25 +343,15 @@ nextBtn.addEventListener('click', () => {
 
 searchInput.addEventListener('input', filterAndNavigate);
 
-// --- Scroll Synchronization (Improved Method) ---
+// --- Scroll Sync ---
 let activePane = null;
 
-baselinePane.addEventListener('mouseenter', () => {
-  activePane = baselinePane;
-});
-
-currentPane.addEventListener('mouseenter', () => {
-  activePane = currentPane;
-});
+baselinePane.addEventListener('mouseenter', () => { activePane = baselinePane; });
+currentPane.addEventListener('mouseenter', () => { activePane = currentPane; });
 
 baselinePane.addEventListener('scroll', () => {
-  if (activePane === baselinePane) {
-    currentPane.scrollTop = baselinePane.scrollTop;
-  }
+  if (activePane === baselinePane) currentPane.scrollTop = baselinePane.scrollTop;
 });
-
 currentPane.addEventListener('scroll', () => {
-  if (activePane === currentPane) {
-    baselinePane.scrollTop = currentPane.scrollTop;
-  }
+  if (activePane === currentPane) baselinePane.scrollTop = currentPane.scrollTop;
 });
