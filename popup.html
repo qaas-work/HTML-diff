@@ -2,31 +2,76 @@
 <html>
 <head>
   <title>HTML Capture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; margin: 10px; width: 240px; background-color: #f9f9f9; }
-    button {
-      display: block; width: 100%; margin: 8px 0; padding: 10px;
-      font-size: 14px; cursor: pointer; border: 1px solid transparent; border-radius: 4px;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+    body { 
+      font-family: 'Instrument Sans', Arial, sans-serif; 
+      margin: 10px; 
+      width: 240px; 
+      background-color: #ffffff; 
+      color: #000; 
     }
-    .primary-btn { background-color: #007acc; color: #fff; }
-    .primary-btn:hover { background-color: #005a9e; }
-    .secondary-btn { background-color: #4CAF50; color: #fff; }
-    .secondary-btn:hover { background-color: #45a049; }
-    .tertiary-btn { background-color: #fff; color: #555; border-color: #ccc; }
-    .tertiary-btn:hover { background-color: #f0f0f0; }
-    .danger-btn { background-color: #d9534f; color: #fff; }
-    .danger-btn:hover { background-color: #c9302c; }
+    button {
+      display: block; 
+      width: 100%; 
+      margin: 8px 0; 
+      padding: 10px;
+      font-size: 14px; 
+      cursor: pointer; 
+      border: 1px solid transparent; 
+      border-radius: 4px;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      font-family: inherit;
+      font-weight: 500;
+    }
 
-    .info-box { border: 1px solid #ddd; padding: 10px; margin-top: 12px; border-radius: 4px; background-color: #fff; }
-    .meta { font-size: 12px; color: #666; word-wrap: break-word; }
+    /* Dark blue primary (Capture button) */
+    .primary-btn { background-color: #003366; color: #fff; }
+    .primary-btn:hover { background-color: #002244; }
+
+    /* Lighter blue secondary (Compare, View Changes) */
+    .secondary-btn { background-color: #3399ff; color: #fff; }
+    .secondary-btn:hover { background-color: #1a85e6; }
+
+    /* Black tertiary (Manage Baselines) */
+    .tertiary-btn { background-color: #000; color: #fff; border: 1px solid #000; }
+    .tertiary-btn:hover { background-color: #222; }
+
+    /* Danger (if needed later) */
+    .danger-btn { background-color: #c9302c; color: #fff; }
+    .danger-btn:hover { background-color: #a82824; }
+
+    /* Info box styled to theme */
+    .info-box { 
+      border: 1px solid #003366; 
+      padding: 10px; 
+      margin-top: 12px; 
+      border-radius: 4px; 
+      background-color: #f9f9f9; 
+      font-family: inherit;
+    }
+    .meta { font-size: 12px; color: #000; word-wrap: break-word; }
+
+    /* Message box */
     #messageBox {
-      padding: 10px; margin-top: 10px; border-radius: 4px;
-      text-align: center; display: none;
+      padding: 10px; 
+      margin-top: 10px; 
+      border-radius: 4px;
+      text-align: center; 
+      display: none;
+      font-family: inherit;
     }
     .show { display: block !important; }
-    .success { background-color: #dff0d8; color: #3c763d; }
-    .error { background-color: #f2dede; color: #a94442; }
+    .success { background-color: #e6f7ff; color: #005a9e; border: 1px solid #3399ff; }
+    .error { background-color: #ffe6e6; color: #a94442; border: 1px solid #c9302c; }
+
+    footer { 
+      font-size: 10px; 
+      color: #555; 
+      text-align: center; 
+      margin-top: 15px; 
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
@@ -41,6 +86,9 @@
   <button id="manageBtn" class="tertiary-btn">Manage All Baselines</button>
 
   <div id="messageBox"></div>
+
+  <footer>&copy; Qaas.work - We don't chase quality, we Guarantee it</footer>
+
   <script src="popup.js"></script>
 </body>
 </html>
