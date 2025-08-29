@@ -34,8 +34,10 @@
     Launch the HTML-diff extension.
 ![extension icon](assets/icon.png)
 
+![extension preview](assets/preview.png)
+
     Select Capture Baseline to save the initial HTML structure of the page.
-![extension preview](assets/extension-preview.png)
+
 ![extension capture](assets/capture.png)
 
     Make the desired changes to the HTML structure.
@@ -44,7 +46,7 @@
 ![extension compare](assets/compare.png)
 
     Use View Changes (Merged) to see the updated structure directly on the webpage.
-![extension Merged](assets/Merged_changes.png)
+![extension Merged](assets/merged.png)
     Open Manage Baselines to:
 ![extension Manage](assets/view-delete-baseline.png)
         View all your saved baselines with date/time stamps.
