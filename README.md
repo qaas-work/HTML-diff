@@ -32,16 +32,16 @@
     Open the webpage you want to test.
 
     Launch the HTML-diff extension.
-    ![extension icon](HTML-diff/assets/icon.png)
+![extension icon](HTML-diff/assets/icon.png)
 
     Select Capture Baseline to save the initial HTML structure of the page.
-    ![extension preview](HTML-diff/assets/extension-preview.png)
-    ![extension capture](HTML-diff/assets/capture.png)
+![extension preview](HTML-diff/assets/extension-preview.png)
+![extension capture](HTML-diff/assets/capture.png)
 
     Make the desired changes to the HTML structure.
 
     Click Compare (Side-by-Side) to open a new window showing the baseline vs. changed HTML.
-    ![extension compare](HTML-diff/assets/compare.png)
+![extension compare](HTML-diff/assets/compare.png)
 
     Use View Changes (Merged) to see the updated structure directly on the webpage.
     ![extension Merged](HTML-diff/assets/Merged_changes.png)
