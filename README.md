@@ -32,7 +32,7 @@
     Open the webpage you want to test.
 
     Launch the HTML-diff extension.
-![extension icon](HTML-diff/assets/icon.png)
+![extension icon](assets/icon.png)
 
     Select Capture Baseline to save the initial HTML structure of the page.
 ![extension preview](HTML-diff/assets/extension-preview.png)
