@@ -35,18 +35,18 @@
 ![extension icon](assets/icon.png)
 
     Select Capture Baseline to save the initial HTML structure of the page.
-![extension preview](HTML-diff/assets/extension-preview.png)
-![extension capture](HTML-diff/assets/capture.png)
+![extension preview](assets/extension-preview.png)
+![extension capture](assets/capture.png)
 
     Make the desired changes to the HTML structure.
 
     Click Compare (Side-by-Side) to open a new window showing the baseline vs. changed HTML.
-![extension compare](HTML-diff/assets/compare.png)
+![extension compare](assets/compare.png)
 
     Use View Changes (Merged) to see the updated structure directly on the webpage.
-    ![extension Merged](HTML-diff/assets/Merged_changes.png)
+![extension Merged](assets/Merged_changes.png)
     Open Manage Baselines to:
-        ![extension Manage](HTML-diff/assets/view-delete-baseline.png)
+![extension Manage](assets/view-delete-baseline.png)
         View all your saved baselines with date/time stamps.
         Delete any baseline you no longer need.
 
